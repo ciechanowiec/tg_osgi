@@ -18,8 +18,6 @@
 :stylesdir: https://www.ciechanowiec.eu/linux_mantra/
 :stylesheet: adoc-css-style.css
 
-//TODO: Review LDAP
-
 This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/TelegramBots/tree/master/telegrambots-longpolling[_Telegram Bots Long Polling_].
 
 == Features
