@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.ciechanowiec</groupId>
+    <artifactId>org.telegram_telegrambots-longpolling</artifactId>
+    <version>7.4.2</version>
+
+    <name>Telegram Bots Long Polling - OSGi Bundle</name>
+    <description>Shaded OSGi bundle of Telegram Bots Long Polling</description>
+    <url>${url}</url>
+    <inceptionYear>2024</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>MIT No Attribution</name>
+            <url>https://spdx.org/licenses/MIT-0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:ciechanowiec/tg_osgi.git</connection>
+        <developerConnection>scm:git:git@github.com:ciechanowiec/tg_osgi.git</developerConnection>
+        <tag>${project.artifactId}-${project.version}</tag>
+        <url>${url}</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>ciechanowiec</id>
+            <name>${project.developer.name}</name>
+            <email>${project.developer.email}</email>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>${url}/issues</url>
+    </issueManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <url>https://github.com/ciechanowiec/tg_osgi</url>
+        <project.developer.name>Herman Ciechanowiec</project.developer.name>
+        <project.developer.email>herman@ciechanowiec.eu</project.developer.email>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+        <max.jdk.version>18</max.jdk.version>
+        <telegrambots-longpolling.version>${project.version}</telegrambots-longpolling.version>
+        <bctls-jdk15on.version>1.70</bctls-jdk15on.version>
+        <conscrypt-openjdk-uber.version>2.5.2</conscrypt-openjdk-uber.version>
+        <openjsse.version>1.1.14</openjsse.version>
+        <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
+        <min.maven.version>3.8.6</min.maven.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <bnd-maven-plugin.version>7.0.0</bnd-maven-plugin.version>
+        <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
+        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
+        <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+        <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
+        <maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
+        <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+        <gmavenplus-plugin.version>3.0.2</gmavenplus-plugin.version>
+        <maven-dependency-plugin.version>3.7.0</maven-dependency-plugin.version>
+        <groovy.version>4.0.21</groovy.version>
+        <groovy-ant.version>4.0.21</groovy-ant.version>
+        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-longpolling</artifactId>
+            <version>${telegrambots-longpolling.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-jdk15on</artifactId>
+            <version>${bctls-jdk15on.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.conscrypt</groupId>
+            <artifactId>conscrypt-openjdk-uber</artifactId>
+            <version>${conscrypt-openjdk-uber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjsse</groupId>
+            <artifactId>openjsse</artifactId>
+            <version>${openjsse.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>display-parent-updates</goal>
+                            <goal>display-property-updates</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <ruleSet>
+                        <ignoreVersions>
+                            <ignoreVersion>
+                                <!-- Ignoring milestone versions, like 3.0.4-M5 and 1.0.0-m23 -->
+                                <type>regex</type>
+                                <version>(?i)[0-9].+-m[0-9]+</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <!-- Ignoring alpha versions, like 5.0.0.Alpha2 and 12.0.0.alpha3 -->
+                                <type>regex</type>
+                                <version>(?i).*ALPHA.*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <!-- Ignoring beta versions, like 5.0.0.Beta2 and 12.0.0.beta3 -->
+                                <type>regex</type>
+                                <version>(?i).*BETA.*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <!-- Ignoring preview versions, like 12.1.0.jre11-preview -->
+                                <type>regex</type>
+                                <version>(?i).*PREVIEW.*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <!-- Ignoring candidate release versions, like 6.2.0.CR2 -->
+                                <type>regex</type>
+                                <version>(?i)[0-9].+\.CR[0-9]+</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <!-- Ignoring release candidate versions, like 2.16.1-rc1 and 1.8.20-RC -->
+                                <type>regex</type>
+                                <version>(?i)[0-9].+-rc[0-9]*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <!-- Ignoring develop versions, like 15.0.0.Dev01 -->
+                                <type>regex</type>
+                                <version>(?i)[0-9].+\.dev[0-9]*</version>
+                            </ignoreVersion>
+                        </ignoreVersions>
+                    </ruleSet>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true
+                            </shadedArtifactAttached> <!--  Must stay not to override a jar created for bnd  -->
+                            <finalName>${project.artifactId}-${project.version}</finalName>
+                            <createSourcesJar>true</createSourcesJar>
+                            <outputDirectory>${project.build.directory}/shaded</outputDirectory>
+                            <artifactSet>
+                                <includes>
+                                    <include>*:*</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>${project.groupId}:${project.artifactId}</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*</exclude>
+                                        <exclude>META-INF/**/*</exclude>
+                                        <exclude>OSGI-INF/*</exclude>
+                                        <exclude>module-info.class</exclude>
+                                        <exclude>module-info.java</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-license-and-readme-to-jar</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>LICENSE.txt</include>
+                                        <include>README.adoc</include>
+                                        <include>README-docinfo.html</include>
+                                        <include>README-docinfo-footer.html</include>
+                                    </includes>
+                                    <!-- To enable variables in the resources files
+                                         (https://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html): -->
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-maven-plugin</artifactId>
+                <version>${bnd-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>bnd-process</id>
+                        <goals>
+                            <goal>bnd-process</goal>
+                        </goals>
+                        <configuration>
+                            <bnd><![CDATA[
+                        Bundle-Category: Telegram
+                        Bundle-Description: ${project.description}
+                        Bundle-DocURL: ${url}
+                        Bundle-Name: ${project.name}
+                        Bundle-SymbolicName: ${project.groupId}.${project.artifactId}
+                        Bundle-Vendor: ${project.developer.name}
+                        Bundle-Version: ${project.version}
+                        Export-Package: org.telegram.*;-noimport:=true, \
+                                        com.fasterxml.jackson.*;-noimport:=true, \
+                                        okhttp3.*;-noimport:=true, \
+                                        okio.*;-noimport:=true, \
+                                        org.conscrypt.*;-noimport:=true, \
+                                        kotlin.*;-noimport:=true
+                        Import-Package: org.slf4j;version="[1.7,2)", \
+                                        android.net.http.*;resolution:=optional, \
+                                        android.net.ssl.*;resolution:=optional, \
+                                        android.os.*;resolution:=optional, \
+                                        android.security.*;resolution:=optional, \
+                                        android.util.*;resolution:=optional, \
+                                        dalvik.system.*;resolution:=optional, \
+                                        kotlin.reflect.jvm.internal.*;resolution:=optional, \
+                                        !sun.net.*, \
+                                        !sun.nio.ch.*, \
+                                        !sun.security.*, \
+                                        !sun.util.*, \
+                                        *
+                        Private-Package: !org.slf4j.*,*;-split-package:=merge-first
+                        Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=${maven.compiler.release}))"
+                                                        ]]></bnd>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>META-INF</excludes>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>shaded-sources</classifier>
+                                    <outputDirectory>${project.build.directory}/extracted-sources</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>put-javadoc-in-jar-archive</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <sourcepath>${project.build.directory}/extracted-sources</sourcepath>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>ISO-8859-1</encoding>
+                    <show>package</show>
+                    <failOnError>false</failOnError>
+                    <!-- The line below fixes a bug with search present probably only until JDK 13
+                         (https://stackoverflow.com/questions/52326318/maven-javadoc-search-redirects-to-undefined-url) -->
+                    <additionalJOption>--no-module-directories</additionalJOption>
+                    <additionalJOption>--ignore-source-errors</additionalJOption>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven-antrun-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>remove-and-rename-shaded</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="${project.build.directory}/shaded/${project.build.finalName}-shaded-sources.jar"
+                                      tofile="${project.build.directory}/${project.build.finalName}-sources.jar"/>
+                                <delete dir="${project.build.directory}/shaded"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/${project.build.finalName}-sources.jar</file>
+                                    <type>jar</type>
+                                    <classifier>sources</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>current.year</name>
+                            <pattern>yyyy</pattern>
+                            <locale>GB</locale>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenplus-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>remove-primary-artefact</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scripts>
+                        <![CDATA[
+                                import org.apache.maven.artifact.Artifact
+
+                                def attachedArtifacts = project.getAttachedArtifacts()
+                                def toRemove = attachedArtifacts.findAll { it.classifier?.contains("shaded") }
+                                attachedArtifacts.removeAll(toRemove)
+                                ]]>
+                    </scripts>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.groovy</groupId>
+                        <artifactId>groovy</artifactId>
+                        <version>${groovy.version}</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.groovy</groupId>
+                        <artifactId>groovy-ant</artifactId>
+                        <version>${groovy-ant.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[${min.maven.version},)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-jdk-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[${maven.compiler.release}, ${max.jdk.version})</version>
+                                    <message>The project requires JDK of ${maven.compiler.release} version</message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Release procedure:
+        1. `mvn clean deploy -P release` -> will perform deploy and release
+        2. Add the following settings to ~/.m2/settings.xml:
+        ****
+        <settings>
+          <servers>
+            <server>
+              <id>ossrh</id>
+              <username>your-jira-id</username>
+              <password>your-jira-pwd</password>
+            </server>
+          </servers>
+        </settings>
+        ****
+        -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>${nexus-staging-maven-plugin.version}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
