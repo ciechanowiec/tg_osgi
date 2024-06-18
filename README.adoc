@@ -1,5 +1,5 @@
 [.text-justify]
-= Telegram Bots Long Polling - OSGi Bundle
+= Telegram Bots API - OSGi Bundle
 :reproducible:
 :doctype: article
 :author: Herman Ciechanowiec
@@ -18,7 +18,7 @@
 :stylesdir: https://www.ciechanowiec.eu/linux_mantra/
 :stylesheet: adoc-css-style.css
 
-This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/TelegramBots/tree/master/telegrambots-longpolling[_Telegram Bots Long Polling_].
+This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/TelegramBots/tree/master/telegrambots-longpolling[_Telegram Bots Long Polling_] and https://github.com/rubenlagus/TelegramBots/tree/master/telegrambots-client[_Telegram Bots Client_].
 
 == Features
 . Maven coordinates for the bundle delivered by this repository:
@@ -27,7 +27,7 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 ----
 <dependency>
     <groupId>eu.ciechanowiec</groupId>
-    <artifactId>org.telegram_telegrambots-longpolling</artifactId>
+    <artifactId>org.telegram_telegrambots-api</artifactId>
     <version>7.4.2</version>
 </dependency>
 ----
@@ -38,6 +38,17 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 <dependency>
     <groupId>org.telegram</groupId>
     <artifactId>telegrambots-longpolling</artifactId>
+    <version>7.4.2</version>
+</dependency>
+----
+
+. Maven coordinates for the original _Telegram Bots Client_:
++
+[source, xml]
+----
+<dependency>
+    <groupId>org.telegram</groupId>
+    <artifactId>telegrambots-client</artifactId>
     <version>7.4.2</version>
 </dependency>
 ----

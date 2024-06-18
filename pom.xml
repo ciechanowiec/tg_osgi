@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>eu.ciechanowiec</groupId>
-    <artifactId>org.telegram_telegrambots-longpolling</artifactId>
+    <artifactId>org.telegram_telegrambots-api</artifactId>
     <version>7.4.2</version>
 
-    <name>Telegram Bots Long Polling - OSGi Bundle</name>
-    <description>Shaded OSGi bundle of Telegram Bots Long Polling</description>
+    <name>Telegram Bots API - OSGi Bundle</name>
+    <description>Shaded OSGi bundle of Telegram Bots API</description>
     <url>${url}</url>
     <inceptionYear>2024</inceptionYear>
 
@@ -60,6 +60,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <max.jdk.version>18</max.jdk.version>
         <telegrambots-longpolling.version>${project.version}</telegrambots-longpolling.version>
+        <telegrambots-client.version>${project.version}</telegrambots-client.version>
         <bctls-jdk15on.version>1.70</bctls-jdk15on.version>
         <conscrypt-openjdk-uber.version>2.5.2</conscrypt-openjdk-uber.version>
         <openjsse.version>1.1.14</openjsse.version>
@@ -86,6 +87,11 @@
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-longpolling</artifactId>
             <version>${telegrambots-longpolling.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-client</artifactId>
+            <version>${telegrambots-client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
