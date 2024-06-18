@@ -488,8 +488,8 @@
           <servers>
             <server>
               <id>ossrh</id>
-              <username>your-jira-id</username>
-              <password>your-jira-pwd</password>
+              <username>your-dynamic-nexus-id</username>
+              <password>your-nexus-token</password>
             </server>
           </servers>
         </settings>
