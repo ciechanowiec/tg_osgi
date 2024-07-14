@@ -28,7 +28,7 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 <dependency>
     <groupId>eu.ciechanowiec</groupId>
     <artifactId>org.telegram_telegrambots-api</artifactId>
-    <version>7.4.2</version>
+    <version>7.7.1</version>
 </dependency>
 ----
 . Maven coordinates for the original _Telegram Bots Long Polling_:
@@ -38,7 +38,7 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 <dependency>
     <groupId>org.telegram</groupId>
     <artifactId>telegrambots-longpolling</artifactId>
-    <version>7.4.2</version>
+    <version>7.7.1</version>
 </dependency>
 ----
 
@@ -49,13 +49,13 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 <dependency>
     <groupId>org.telegram</groupId>
     <artifactId>telegrambots-client</artifactId>
-    <version>7.4.2</version>
+    <version>7.7.1</version>
 </dependency>
 ----
 
 . The bundle delivered by this repository includes a JAR file with all source code and original Javadocs, making its usage more convenient.
 
-. To run the bundle delivered by this repository, Java 17 or higher is required.
+. To run the bundle delivered by this repository, Java 21 or higher is required.
 
 . All dependencies not typically present in a standard OSGi environment and required by the bundle delivered by this repository are embedded within the bundle itself, ensuring it is self-sufficient and ready to run in an OSGi environment.
 

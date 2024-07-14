@@ -6,7 +6,7 @@
 
     <groupId>eu.ciechanowiec</groupId>
     <artifactId>org.telegram_telegrambots-api</artifactId>
-    <version>7.4.2</version>
+    <version>7.7.1</version>
 
     <name>Telegram Bots API - OSGi Bundle</name>
     <description>Shaded OSGi bundle of Telegram Bots API</description>
@@ -57,29 +57,28 @@
         <project.developer.name>Herman Ciechanowiec</project.developer.name>
         <project.developer.email>herman@ciechanowiec.eu</project.developer.email>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <max.jdk.version>18</max.jdk.version>
+        <maven.compiler.release>21</maven.compiler.release>
         <telegrambots-longpolling.version>${project.version}</telegrambots-longpolling.version>
         <telegrambots-client.version>${project.version}</telegrambots-client.version>
         <bctls-jdk15on.version>1.70</bctls-jdk15on.version>
         <conscrypt-openjdk-uber.version>2.5.2</conscrypt-openjdk-uber.version>
         <openjsse.version>1.1.14</openjsse.version>
-        <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
         <min.maven.version>3.8.6</min.maven.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <bnd-maven-plugin.version>7.0.0</bnd-maven-plugin.version>
         <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
-        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
         <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
+        <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
         <maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <gmavenplus-plugin.version>3.0.2</gmavenplus-plugin.version>
-        <maven-dependency-plugin.version>3.7.0</maven-dependency-plugin.version>
-        <groovy.version>4.0.21</groovy.version>
-        <groovy-ant.version>4.0.21</groovy-ant.version>
-        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+        <maven-dependency-plugin.version>3.7.1</maven-dependency-plugin.version>
+        <groovy.version>4.0.22</groovy.version>
+        <groovy-ant.version>4.0.22</groovy-ant.version>
+        <versions-maven-plugin.version>2.17.0</versions-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -281,6 +280,8 @@
                                         *
                         Private-Package: !org.slf4j.*,*;-split-package:=merge-first
                         Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=${maven.compiler.release}))"
+                        # reproducible builds (https://github.com/bndtools/bnd/issues/3521)
+                        -noextraheaders: true
                                                         ]]></bnd>
 
                         </configuration>
@@ -325,37 +326,11 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>put-javadoc-in-jar-archive</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <sourcepath>${project.build.directory}/extracted-sources</sourcepath>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <encoding>ISO-8859-1</encoding>
-                    <show>package</show>
-                    <failOnError>false</failOnError>
-                    <!-- The line below fixes a bug with search present probably only until JDK 13
-                         (https://stackoverflow.com/questions/52326318/maven-javadoc-search-redirects-to-undefined-url) -->
-                    <additionalJOption>--no-module-directories</additionalJOption>
-                    <additionalJOption>--ignore-source-errors</additionalJOption>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>${maven-antrun-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>remove-and-rename-shaded</id>
+                        <id>adjust-artifacts</id>
                         <phase>package</phase>
                         <goals>
                             <goal>run</goal>
@@ -364,6 +339,8 @@
                             <target>
                                 <copy file="${project.build.directory}/shaded/${project.build.finalName}-shaded-sources.jar"
                                       tofile="${project.build.directory}/${project.build.finalName}-sources.jar"/>
+                                <copy file="${project.build.directory}/${project.build.finalName}-sources.jar"
+                                      tofile="${project.build.directory}/${project.build.finalName}-javadoc.jar"/>
                                 <delete dir="${project.build.directory}/shaded"/>
                             </target>
                         </configuration>
@@ -387,6 +364,11 @@
                                     <file>${project.build.directory}/${project.build.finalName}-sources.jar</file>
                                     <type>jar</type>
                                     <classifier>sources</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.build.directory}/${project.build.finalName}-javadoc.jar</file>
+                                    <type>jar</type>
+                                    <classifier>javadoc</classifier>
                                 </artifact>
                             </artifacts>
                         </configuration>
@@ -467,8 +449,12 @@
                         </goals>
                         <configuration>
                             <rules>
+                                <requireMavenVersion>
+                                    <message>Project must be built with Maven 3.9.0 or higher</message>
+                                    <version>[3.9.0,)</version>
+                                </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[${maven.compiler.release}, ${max.jdk.version})</version>
+                                    <version>${maven.compiler.release}</version>
                                     <message>The project requires JDK of ${maven.compiler.release} version</message>
                                 </requireJavaVersion>
                             </rules>
@@ -502,6 +488,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
+                        <version>${maven-deploy-plugin.version}</version>
                         <configuration>
                             <skip>false</skip>
                         </configuration>
