@@ -6,7 +6,7 @@
 
     <groupId>eu.ciechanowiec</groupId>
     <artifactId>org.telegram_telegrambots-api</artifactId>
-    <version>7.7.1</version>
+    <version>7.7.3</version>
 
     <name>Telegram Bots API - OSGi Bundle</name>
     <description>Shaded OSGi bundle of Telegram Bots API</description>
@@ -78,7 +78,7 @@
         <maven-dependency-plugin.version>3.7.1</maven-dependency-plugin.version>
         <groovy.version>4.0.22</groovy.version>
         <groovy-ant.version>4.0.22</groovy-ant.version>
-        <versions-maven-plugin.version>2.17.0</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -260,7 +260,6 @@
                         Bundle-Vendor: ${project.developer.name}
                         Bundle-Version: ${project.version}
                         Export-Package: org.telegram.*;-noimport:=true, \
-                                        com.fasterxml.jackson.*;-noimport:=true, \
                                         okhttp3.*;-noimport:=true, \
                                         okio.*;-noimport:=true, \
                                         org.conscrypt.*;-noimport:=true, \
@@ -282,6 +281,15 @@
                         Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=${maven.compiler.release}))"
                         # reproducible builds (https://github.com/bndtools/bnd/issues/3521)
                         -noextraheaders: true
+                        # 1. 'com.fasterxml.jackson.*' is commonly exported in OSGi environment by a dedicated
+                        #    jackson libraries and if both those libraries and this Telegram application will export
+                        #    'com.fasterxml.jackson.*', dependency conflicts might arise.
+                        # 2. 'org.telegram.telegrambots' rather doesn't have required public references to
+                        #    'com.fasterxml.jackson.*', so there is no relevant risk in not exporting
+                        #    'com.fasterxml.jackson.*' by this Telegram application itself and respective
+                        #    warning messages can be rather safely disabled.
+                        #    On messages disablement see https://github.com/bndtools/bnd/issues/3444.
+                        -fixupmessages.privateexport: "Export*org\.telegram\.telegrambots*has*private references*com\.fasterxml\.jackson"; restrict:=warning; is:=ignore
                                                         ]]></bnd>
 
                         </configuration>
