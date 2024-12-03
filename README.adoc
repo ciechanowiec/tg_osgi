@@ -28,8 +28,7 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 <dependency>
     <groupId>eu.ciechanowiec</groupId>
     <artifactId>org.telegram_telegrambots-api</artifactId>
-    <version>7.7.3</version>
-</dependency>
+    <version>8.0.0</version> </dependency>
 ----
 . Maven coordinates for the original _Telegram Bots Long Polling_:
 +
@@ -38,7 +37,7 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 <dependency>
     <groupId>org.telegram</groupId>
     <artifactId>telegrambots-longpolling</artifactId>
-    <version>7.7.3</version>
+    <version>8.0.0</version>
 </dependency>
 ----
 
@@ -49,7 +48,7 @@ This repository delivers a shaded OSGi bundle of https://github.com/rubenlagus/T
 <dependency>
     <groupId>org.telegram</groupId>
     <artifactId>telegrambots-client</artifactId>
-    <version>7.7.3</version>
+    <version>8.0.0</version>
 </dependency>
 ----
 
